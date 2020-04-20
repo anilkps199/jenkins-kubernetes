@@ -34,9 +34,9 @@ master:
   # Environment Variables
   ContainerEnv:
     - name: CASC_JENKINS_CONFIG
-      value: https://raw.githubusercontent.com/anilkps199/jenkins-kubernetes/master/casc/config.yml
+      value: "https://raw.githubusercontent.com/anilkps199/jenkins-kubernetes/master/casc/config.yml"
     - name: JENKINS_URL
-      value: http://10.0.212.146:30901
+      value: "http://10.0.212.146:30901"
   installPlugins:
     - kubernetes:1.25.1
     - workflow-job:2.36

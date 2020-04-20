@@ -42,7 +42,7 @@ master:
     - workflow-job:2.36
     - workflow-aggregator:2.6
     - credentials-binding:1.21
-    - git:4.2.0
+    - git:4.2.2
     - blueocean:1.22.0
     - greenballs:1.15
     - configuration-as-code:1.39

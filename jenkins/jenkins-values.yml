@@ -1,0 +1,105 @@
+master:
+  componentName: "jenkins-master"
+  image: "jenkins/jenkins"
+  tag: "lts"
+  imagePullPolicy: "Always"
+  numExecutors: 2
+  customJenkinsLabels:
+    - jenkins-job-builder
+  # configAutoReload requires UseSecurity is set to true:
+  useSecurity: true
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "256Mi"
+    limits:
+      cpu: "2000m"
+      memory: "4096Mi"
+  adminUser: "admin"
+  servicePort: 8080
+  targetPort: 8080
+  # For minikube, set this to NodePort, elsewhere use LoadBalancer
+  # Use ClusterIP if your setup includes ingress controller
+  serviceType: NodePort
+  # Jenkins master service annotations
+  serviceAnnotations: {}
+  nodePort: 30901
+  healthProbes: true
+  healthProbesLivenessTimeout: 5
+  slaveListenerPort: 50000
+  # LoadBalancerSourcesRange is a list of allowed CIDR values, which are combined with ServicePort to
+  # set allowed inbound rules on the security group assigned to the master load balancer
+  loadBalancerSourceRanges:
+    - 0.0.0.0/0
+  # Environment Variables
+  ContainerEnv:
+    - name: CASC_JENKINS_CONFIG
+      value: https://raw.githubusercontent.com/tizianatroukens/jenkins-kubernetes/master/casc/config.yml
+    - name: JENKINS_URL
+      value: http://10.0.212.146:30901
+  installPlugins:
+    - kubernetes:1.25.1
+    - workflow-job:2.36
+    - workflow-aggregator:2.6
+    - credentials-binding:1.21
+    - git:4.2.0
+    - blueocean:1.22.0
+    - greenballs:1.15
+    - configuration-as-code:1.39
+    - job-dsl:1.77
+    - configuration-as-code-support:1.18
+    - role-strategy:latest
+  # Used to approve a list of groovy functions in pipelines used the script-security plugin. Can be viewed under /scriptApproval
+  scriptApproval:
+    - "method groovy.json.JsonSlurperClassic parseText java.lang.String"
+    - "new groovy.json.JsonSlurperClassic"
+    - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods leftShift java.util.Map java.util.Map"
+    - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods split java.lang.String"
+  customConfigMap: false
+  nodeSelector: {}
+  tolerations: []
+
+agent:
+  enabled: true
+  image: "jenkins/jnlp-slave"
+  tag: "3.27-1"
+  componentName: "jenkins-slave"
+  privileged: false
+  resources:
+    requests:
+      cpu: "512m"
+      memory: "512Mi"
+    limits:
+      cpu: "512m"
+      memory: "512Mi"
+  # You may want to change this to true while testing a new image
+  alwaysPullImage: false
+  # Controls how agent pods are retained after the Jenkins build completes
+  # Possible values: Always, Never, OnFailure
+  podRetention: "Never"
+  volumes: []
+  # - type: Secret
+  #   secretName: mysecret
+  #   mountPath: /var/myapp/mysecret
+  # - type: EmptyDir
+  #   mountPath: "/var/lib/containers"
+  #   memory: false
+  nodeSelector: {}
+
+persistence:
+  enabled: true
+  annotations: {}
+  accessMode: "ReadWriteOnce"
+  size: "8Gi"
+
+networkPolicy:
+  # Enable creation of NetworkPolicy resources.
+  enabled: false
+  # For Kubernetes v1.4, v1.5 and v1.6, use 'extensions/v1beta1'
+  # For Kubernetes v1.7, use 'networking.k8s.io/v1'
+  apiVersion: networking.k8s.io/v1
+
+## Install Default RBAC roles and bindings
+rbac:
+  create: true
+  readSecrets: false

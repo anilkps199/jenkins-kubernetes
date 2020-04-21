@@ -7,6 +7,7 @@ pipeline {
   }
   agent {
     kubernetes {
+      label 'jenkins-job-builder'
       yamlFile 'jenkins-job-builder/pod.yml'
     }
   }

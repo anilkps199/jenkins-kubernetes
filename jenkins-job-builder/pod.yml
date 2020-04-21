@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  generateName: jjb-
+  name: jenkins-job-builder
   labels:
     some-label: jenkins-job-builder
 spec:
@@ -12,16 +12,3 @@ spec:
       command:
         - cat
       tty: true
-      volumeMounts:
-        - mountPath: /etc/jenkins_jobs/jenkins_jobs.ini
-          name: jjb-config
-          subPath: jenkins_jobs.ini
-    - name: python
-      image: python:alpine
-      command:
-        - cat
-      tty: true
-  volumes:
-    - name: jjb-config
-      configMap:
-        name: jjb-config

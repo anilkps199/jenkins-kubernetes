@@ -1,41 +1,10 @@
 pipeline {
-  triggers {
-      pollSCM('* * * * *')
-  }
-  options{
-      disableConcurrentBuilds()
-  }
-  agent any
-
-  stages {
-    stage ('Checking out') {
-      steps {
-        checkout scm
-      }
-    }
-    stage('install yamllint') {
-      steps {
-        container('python') {
-          sh '/usr/local/bin/pip install yamllint'
+    agent any
+    stages {
+        stage('Example') {
+            steps {
+                echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
+            }
         }
-      }
     }
-    stage('lint it') {
-      steps {
-        container('python') {
-          sh '/usr/local/bin/yamllint -d relaxed jenkins-job-builder/jobs/'
-        }
-      }
-    }
-    stage('Test Jenkins Job Builder Files') {
-      steps {
-        sh 'jenkins-jobs test jenkins-job-builder/jobs/'
-      }
-    }
-    stage('Apply Jenkins Job Builder Files') {
-      steps {
-          sh 'jenkins-jobs update jenkins-job-builder/jobs/'
-      }
-    }
-  }
 }

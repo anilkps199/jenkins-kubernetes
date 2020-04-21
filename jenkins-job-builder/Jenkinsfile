@@ -5,12 +5,7 @@ pipeline {
   options{
       disableConcurrentBuilds()
   }
-  agent {
-    kubernetes {
-      label 'jenkins_job_builder'
-      yamlFile 'jenkins-job-builder/pod.yml'
-    }
-  }
+  agent any
 
   stages {
     stage ('Checking out') {

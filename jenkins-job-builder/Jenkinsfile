@@ -1,37 +1,27 @@
 pipeline {
-    triggers {
-      pollSCM('* * * * *')
-    }
-    agent {
-        kubernetes {
-          label 'jenkins_job_builder'
-          yaml """
+  agent {
+    kubernetes {
+      yaml """
+apiVersion: v1
 kind: Pod
 metadata:
-    name: jenkins-slave
+  labels:
+    some-label: some-label-value
 spec:
-    containers:
-        - name: kaniko
-          image: gcr.io/kaniko-project/executor:debug
-          imagePullPolicy: Always
-          command:
-              - /busybox/cat
-          tty: true
-          volumeMounts:
-              - name: aws-secret
-                mountPath: /root/.aws/
-              - name: docker-registry-config
-                mountPath: /kaniko/.docker
-    restartPolicy: Never
-    volumes:
-        - name: aws-secret
-          secret:
-              secretName: aws-secret
-        - name: docker-registry-config
-          configMap:
-              name: docker-registry-config"""
-       }
+  containers:
+  - name: maven
+    image: maven:alpine
+    command:
+    - cat
+    tty: true
+  - name: busybox
+    image: busybox
+    command:
+    - cat
+    tty: true
+"""
     }
+  }
     stages {
         stage('Example') {
             steps {

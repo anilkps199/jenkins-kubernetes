@@ -1,46 +1,22 @@
-
 pipeline {
-  triggers {
-      pollSCM('* * * * *')
-  }
-  options{
-      disableConcurrentBuilds()
-  }
   agent {
     kubernetes {
-      label 'jenkins_job_builder'
-      yamlFile 'jenkins-job-builder/pod.yml'
+      yamlFile 'jenkins-job-builder/KubernetesPod.yaml'
     }
   }
-
   stages {
-    stage ('Checking out') {
+    stage('Run maven') {
       steps {
-        checkout scm
-      }
-    }
-    stage('install yamllint') {
-      steps {
-        container('python') {
-          sh '/usr/local/bin/pip install yamllint'
+        sh 'set'
+        sh "echo OUTSIDE_CONTAINER_ENV_VAR = ${CONTAINER_ENV_VAR}"
+        container('maven') {
+          sh 'echo MAVEN_CONTAINER_ENV_VAR = ${CONTAINER_ENV_VAR}'
+          sh 'mvn -version'
         }
-      }
-    }
-    stage('lint it') {
-      steps {
-        container('python') {
-          sh '/usr/local/bin/yamllint -d relaxed jenkins-job-builder/jobs/'
+        container('busybox') {
+          sh 'echo BUSYBOX_CONTAINER_ENV_VAR = ${CONTAINER_ENV_VAR}'
+          sh '/bin/busybox'
         }
-      }
-    }
-    stage('Test Jenkins Job Builder Files') {
-      steps {
-        sh 'jenkins-jobs test jenkins-job-builder/jobs/'
-      }
-    }
-    stage('Apply Jenkins Job Builder Files') {
-      steps {
-          sh 'jenkins-jobs update jenkins-job-builder/jobs/'
       }
     }
   }

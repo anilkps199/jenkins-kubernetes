@@ -23,7 +23,7 @@ master:
   serviceType: NodePort
   # Jenkins master service annotations
   serviceAnnotations: {}
-  nodePort: 30901
+  nodePort: 30902
   healthProbes: true
   healthProbesLivenessTimeout: 5
   slaveListenerPort: 50000
@@ -32,11 +32,16 @@ master:
   loadBalancerSourceRanges:
     - 0.0.0.0/0
   # Environment Variables
-  ContainerEnv:
+  initContainerEnv:
     - name: CASC_JENKINS_CONFIG
       value: "https://raw.githubusercontent.com/anilkps199/jenkins-kubernetes/master/casc/config.yml"
     - name: JENKINS_URL
-      value: "http://10.0.212.146:30901"
+      value: "http://10.0.212.146:30902"
+  containerEnv:
+    - name: CASC_JENKINS_CONFIG
+      value: "https://raw.githubusercontent.com/anilkps199/jenkins-kubernetes/master/casc/config.yml"
+    - name: JENKINS_URL
+      value: "http://10.0.212.146:30902"
   installPlugins:
     - kubernetes:1.25.1
     - workflow-job:2.36

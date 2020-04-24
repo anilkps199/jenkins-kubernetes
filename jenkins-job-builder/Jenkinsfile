@@ -7,7 +7,6 @@ pipeline {
   }
   agent {
     kubernetes {
-      label 'jenkins-job-builder'
       defaultContainer 'jenkins-job-builder'
       yamlFile 'jenkins-job-builder/pod.yml'
     }
@@ -35,12 +34,16 @@ pipeline {
     }
     stage('Test Jenkins Job Builder Files') {
       steps {
-        sh 'jenkins-jobs test jenkins-job-builder/jobs/'
+        container('jenkins-job-builder') {
+          sh '/usr/bin/jenkins-jobs test jenkins-job-builder/jobs/'
+        }
       }
     }
     stage('Apply Jenkins Job Builder Files') {
       steps {
-          sh 'jenkins-jobs update jenkins-job-builder/jobs/'
+        container('jenkins-job-builder') {
+          sh '/usr/bin/jenkins-jobs update jenkins-job-builder/jobs/'
+        }
       }
     }
   }
